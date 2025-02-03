@@ -62,11 +62,12 @@ namespace CafeMgmtSystem.Controllers
         }
         [HttpGet]
         [Authorize]
+        [HttpGet(template: "index")]
+
         public string Index()
         {
             return "Valid Authrization";
         }
-        // Generate JWT Token
         private string GenerateJwtToken(ApplicationUser user)
         {
             var claims = new[]
@@ -75,7 +76,7 @@ namespace CafeMgmtSystem.Controllers
             new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, user.UserName),
             new System.Security.Claims.Claim("FirstName", user.FirstName),
             new System.Security.Claims.Claim("LastName", user.LastName)
-        };
+            };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -88,6 +89,18 @@ namespace CafeMgmtSystem.Controllers
                 signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+        [Authorize] 
+        [HttpGet("profile")]
+        public async Task<IActionResult> GetUsernameById(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound();  
+            }
+            var username = user.FirstName + " " + user.LastName;
+            return Ok(username);
         }
     }
 }
