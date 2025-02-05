@@ -3,20 +3,24 @@ using CafeMgmtSystem.Repository;
 using Dapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using System.Data;
 
 namespace CafeMgmtSystem.Services
 {
     public class OrderService : IOrderService
     {
         private readonly IOrderRepository _orderRepository;
+        private readonly IPaymentRepository _paymentRepository;
         private readonly IMenuRepository _menuRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public OrderService(IOrderRepository orderRepository, IMenuRepository menuRepository, IHttpContextAccessor httpContextAccessor)
+        public OrderService(IOrderRepository orderRepository, IMenuRepository menuRepository, IHttpContextAccessor httpContextAccessor, IPaymentRepository paymentRepository)
         {
             _orderRepository = orderRepository;
             _menuRepository = menuRepository;
             _httpContextAccessor = httpContextAccessor;
+            _paymentRepository = paymentRepository;
         }
 
         public int CreateOrder(string customerId,int TableID, List<OrderItem> items, string userFullName)
@@ -61,6 +65,9 @@ namespace CafeMgmtSystem.Services
             int affectedRows = _orderRepository.UpdateOrderStatus(orderId, status);
             return affectedRows > 0;
         }
+        public async Task<bool> UpdateOrderStatusAsync(int orderId, int status)
+        {
+           return await _paymentRepository.UpdateOrderStatusAsync(orderId, status);
+        }
     }
-
 }
