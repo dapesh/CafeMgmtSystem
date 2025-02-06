@@ -33,7 +33,7 @@ namespace CafeMgmtSystem.Repository
                 );
             }
         }
-        public int CreateMenuItem(MenuItem menuItem)
+        public int CreateMenuItems(MenuItem menuItem)
         {
             using (var connection = Connection)
             {
