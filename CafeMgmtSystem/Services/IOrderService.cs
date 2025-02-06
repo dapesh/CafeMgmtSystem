@@ -1,4 +1,5 @@
 ﻿using CafeMgmtSystem.Models;
+using static CafeMgmtSystem.Repository.PaymentRepository;
 
 namespace CafeMgmtSystem.Services
 {
@@ -6,7 +7,7 @@ namespace CafeMgmtSystem.Services
     {
         int CreateOrder(string customerId,int TableID, List<OrderItem> items, string userFullName);
         bool UpdateOrderStatus(int orderId, int status);
-        Task<bool> UpdateOrderStatusAsync(int orderId, int status);
+        Task<bool> UpdateOrderStatusAsync(int orderId, LatestOrderStatus status);
 
     }
 }

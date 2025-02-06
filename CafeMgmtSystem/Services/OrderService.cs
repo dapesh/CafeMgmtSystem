@@ -1,10 +1,11 @@
-﻿using CafeMgmtSystem.Models;
-using CafeMgmtSystem.Repository;
+﻿using CafeMgmtSystem.Repository;
 using Dapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using System.Data;
+using static CafeMgmtSystem.Repository.PaymentRepository;
+using CafeMgmtSystem.Models;
 
 namespace CafeMgmtSystem.Services
 {
@@ -65,7 +66,7 @@ namespace CafeMgmtSystem.Services
             int affectedRows = _orderRepository.UpdateOrderStatus(orderId, status);
             return affectedRows > 0;
         }
-        public async Task<bool> UpdateOrderStatusAsync(int orderId, int status)
+        public async Task<bool> UpdateOrderStatusAsync(int orderId, LatestOrderStatus status)
         {
            return await _paymentRepository.UpdateOrderStatusAsync(orderId, status);
         }
