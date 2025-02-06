@@ -1,5 +1,6 @@
 ﻿using CafeMgmtSystem.Models;
 using CafeMgmtSystem.Repository;
+using CafeMgmtSystem.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,10 +11,11 @@ namespace CafeMgmtSystem.Controllers
     public class MenuController : ControllerBase
     {
         private readonly IMenuRepository _menuItemRepository;
-
-        public MenuController(IMenuRepository menuItemRepository)
+        private readonly CloudinaryService _cloudinaryService;
+        public MenuController(IMenuRepository menuItemRepository, CloudinaryService cloudinaryService)
         {
             _menuItemRepository = menuItemRepository;
+            _cloudinaryService = cloudinaryService;
         }
 
         [HttpGet]
@@ -35,9 +37,21 @@ namespace CafeMgmtSystem.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateMenuItem([FromBody] MenuItem menuItem)
+        [Route("create-menu-item")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> CreateMenuItem([FromForm] MenuItem menuItem, [FromForm] IFormFile imageFile)
         {
-            var result = _menuItemRepository.CreateMenuItem(menuItem);
+            if (imageFile == null || imageFile.Length == 0)
+            {
+                return BadRequest("Image file is required.");
+            }
+            var imageUrl = await _cloudinaryService.UploadImageAsync(imageFile);
+            if (string.IsNullOrEmpty(imageUrl))
+            {
+                return BadRequest("Image upload failed.");
+            }
+            menuItem.ImageUrl = imageUrl;
+            var result = _menuItemRepository.CreateMenuItems(menuItem);
             if (result == 0)
             {
                 return BadRequest("Failed to create menu item.");

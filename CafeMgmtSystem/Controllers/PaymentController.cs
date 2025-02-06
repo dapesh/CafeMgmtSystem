@@ -2,7 +2,6 @@
 using CafeMgmtSystem.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
 namespace CafeMgmtSystem.Controllers
 {
     [Route("api/[controller]")]
@@ -10,11 +9,9 @@ namespace CafeMgmtSystem.Controllers
     public class PaymentController : ControllerBase
     {
         private readonly IOrderService _orderService;
-        private readonly IHubContext<NotificationHub> _hubContext;
-        public PaymentController(IOrderService orderService, IHubContext<NotificationHub> hubContext)
+        public PaymentController(IOrderService orderService)
         {
             _orderService = orderService;
-            _hubContext = hubContext;
         }
         [HttpPost("process")]
         public async Task<IActionResult> ProcessPayment([FromBody] PaymentRequest request)
@@ -33,7 +30,6 @@ namespace CafeMgmtSystem.Controllers
 
                 if (updated)
                 {
-                    await _hubContext.Clients.All.SendAsync("ReceiveMessage", "Your order has been completed!");
                     return Ok(new
                     {
                         message = "Payment processed successfully.",

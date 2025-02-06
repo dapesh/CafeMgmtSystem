@@ -36,7 +36,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddSingleton<IDbConnectionFactory>(provider =>
     new DbConnectionFactory(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+builder.Services.AddSingleton<CloudinaryService>();
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()

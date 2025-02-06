@@ -6,7 +6,7 @@ namespace CafeMgmtSystem.Repository
     {
         IEnumerable<MenuItem> GetAllMenuItems();
         MenuItem GetMenuItemById(int id);
-        int CreateMenuItem(MenuItem menuItem);
+        int CreateMenuItems(MenuItem menuItem);
         int UpdateMenuItem(MenuItem menuItem);
         int DeleteMenuItem(int id);
     }
