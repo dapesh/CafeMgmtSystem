@@ -38,7 +38,7 @@ namespace CafeMgmtSystem.Controllers
                 return BadRequest(result.Errors.Select(e => e.Description));
             }
 
-            return Ok(new { Message = "User registered successfully" });
+            return Ok(new { Message = "User registered successfully" , Code = "200"});
         }
 
         // Login a user and return a JWT token
@@ -58,7 +58,7 @@ namespace CafeMgmtSystem.Controllers
             }
 
             var token = GenerateJwtToken(user);
-            return Ok(new TokenModel { Token = token });
+            return Ok(new TokenModel { Token = token, Code="200" });
         }
         [HttpGet]
         [Authorize]
