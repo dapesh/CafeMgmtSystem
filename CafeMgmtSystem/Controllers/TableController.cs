@@ -50,9 +50,9 @@ namespace CafeMgmtSystem.Controllers
         {
             table.Id = id;
             var result =  _tableRepository.UpdateTable(table);
-            if (result == 0)
+            if (result > 0)
             {
-                return NotFound();
+                return Ok(new { Code = "200", Message = "Table Updated Successfully" });
             }
             return NoContent();
         }
@@ -63,23 +63,23 @@ namespace CafeMgmtSystem.Controllers
             var result =  _tableRepository.DeleteTable(id);
             if (result == 0)
             {
-                return NotFound();
+                return Ok(new { Code = "200", Message = "Table Deleted Successfully" });
             }
             return NoContent();
         }
         [HttpPost("book/{id}")]
-        public IActionResult BookTable(int id, [FromBody] DateTime reservedUntil)
+        public IActionResult BookTable(int id, [FromBody] TableBookingRequest request)
         {
-            var success = _tableRepository.BookTable(id, reservedUntil);
+            var success = _tableRepository.BookTable(id, request.ReservedUntil);
             if (!success) return BadRequest("Table booking failed.");
-            return Ok("Table booked successfully.");
+            return Ok(new { Code = "200", Message = "Table booked successfully." });
         }
         [HttpPost("release/{id}")]
         public IActionResult ReleaseTable(int id)
         {
             var success = _tableRepository.ReleaseTable(id);
             if (!success) return BadRequest("Table release failed.");
-            return Ok("Table released successfully.");
+            return Ok(new { Code = "200", Message = "Table released successfully." });
         }
     }
 }

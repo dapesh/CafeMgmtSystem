@@ -1,7 +1,7 @@
-﻿using CafeMgmtSystem.Models;
-using CafeMgmtSystem.Services;
+﻿using CafeMgmtSystem.Services;
 using Dapper;
 using System.Data;
+using Table = CafeMgmtSystem.Models.Table;
 
 namespace CafeMgmtSystem.Repository
 {
@@ -21,7 +21,15 @@ namespace CafeMgmtSystem.Repository
             using (var connection = Connection)
             {
                 connection.Open();
-                var tables =  connection.Query<Table>("GetAllTables", commandType: CommandType.StoredProcedure);
+                var parameters = new DynamicParameters();
+                parameters.Add("Flag", "s");
+                parameters.Add("Result", dbType: DbType.Int32, direction: ParameterDirection.Output); 
+                var tables = connection.Query<Table>(
+                "sp_ManageTable",
+                parameters,
+                commandType: CommandType.StoredProcedure
+                );
+                int result = parameters.Get<int>("Result");
                 return tables;
             }
         }
@@ -31,12 +39,16 @@ namespace CafeMgmtSystem.Repository
             using (var connection = Connection)
             {
                 connection.Open();
-                var table =  connection.QuerySingleOrDefault<Table>(
-                    "GetTableById", 
-                    new { Id = id }, 
-                    commandType: CommandType.StoredProcedure
+                var parameters = new DynamicParameters();
+                parameters.Add("Flag", "g");
+                parameters.Add("Id", id);
+                parameters.Add("Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                var tables = connection.QuerySingleOrDefault<Table>(
+                "sp_ManageTable",
+                parameters,
+                commandType: CommandType.StoredProcedure
                 );
-                return table;
+                return tables;
             }
         }
 
@@ -44,62 +56,75 @@ namespace CafeMgmtSystem.Repository
         {
             using (var connection = Connection)
             {
-                 connection.Open();
-                var result =  connection.Execute(
-                    "CreateTable", 
-                    new 
-                    { 
-                        table.Name, 
-                        table.Seats, 
-                        table.IsAvailable 
-                    },
-                    commandType: CommandType.StoredProcedure
+                connection.Open();
+                var parameters = new DynamicParameters();
+                parameters.Add("Flag", "c");
+                parameters.Add("Name", table.Name);
+                parameters.Add("Seats", table.Seats);
+                parameters.Add("IsAvailable", table.IsAvailable);
+                parameters.Add("Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                var results = connection.Execute(
+                "sp_ManageTable",
+                parameters,
+                commandType: CommandType.StoredProcedure
                 );
-                return result; 
+                int result = parameters.Get<int>("Result");
+                return results;
             }
         }
         public  int UpdateTable(Table table)
         {
             using (var connection = Connection)
             {
-                 connection.Open();
-                var result =  connection.Execute(
-                    "UpdateTable", 
-                    new 
-                    { 
-                        table.Id, 
-                        table.Name, 
-                        table.Seats, 
-                        table.IsAvailable 
-                    },
-                    commandType: CommandType.StoredProcedure
+                connection.Open();
+                var parameters = new DynamicParameters();
+                parameters.Add("Flag", "u");
+                parameters.Add("Id", table.Id);
+                parameters.Add("Name", table.Name);
+                parameters.Add("Seats", table.Seats);
+                parameters.Add("IsAvailable", table.IsAvailable);
+                parameters.Add("Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                var result = connection.Execute(
+                "sp_ManageTable",
+                parameters,
+                commandType: CommandType.StoredProcedure
                 );
-                return result; 
+                return result;
             }
         }
 
-        public  int DeleteTable(int id)
+        public int DeleteTable(int id)
         {
             using (var connection = Connection)
             {
-                 connection.Open();
-                var result =  connection.Execute(
-                    "DeleteTable", 
-                    new { Id = id },
-                    commandType: CommandType.StoredProcedure
+                connection.Open();
+                var parameters = new DynamicParameters();
+                parameters.Add("Flag", "d");
+                parameters.Add("Id", id);
+                parameters.Add("Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                var result = connection.Execute(
+                "sp_ManageTable",
+                parameters,
+                commandType: CommandType.StoredProcedure
                 );
-                return result; 
+                return result;
             }
         }
 
-        public bool BookTable(int id, DateTime reservedUntil)
+        public bool BookTable(int id, string reservedUntil)
         {
             using (var connection = Connection)
             {
+                connection.Open();
+                var parameters = new DynamicParameters();
+                parameters.Add("Flag", "b");
+                parameters.Add("ReservedUntil", reservedUntil);
+                parameters.Add("Id", id);
+                parameters.Add("Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
                 var affectedRows = connection.Execute(
-                    "BookTable",
-                    new { Id = id, ReservedUntil = reservedUntil },
-                    commandType: CommandType.StoredProcedure
+                "sp_ManageTable",
+                parameters,
+                commandType: CommandType.StoredProcedure
                 );
                 return affectedRows > 0;
             }
@@ -109,10 +134,15 @@ namespace CafeMgmtSystem.Repository
         {
             using (var connection = Connection)
             {
+                connection.Open();
+                var parameters = new DynamicParameters();
+                parameters.Add("Flag", "r");
+                parameters.Add("Id", id);
+                parameters.Add("Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
                 var affectedRows = connection.Execute(
-                    "ReleaseTable",
-                    new { Id = id },
-                    commandType: CommandType.StoredProcedure
+                "sp_ManageTable",
+                parameters,
+                commandType: CommandType.StoredProcedure
                 );
                 return affectedRows > 0;
             }
