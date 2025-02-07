@@ -39,8 +39,8 @@ namespace CafeMgmtSystem.Repository
             {
                 connection.Open();
                 return connection.Execute(
-                    "CreateMenuItem",
-                    new { menuItem.Name, menuItem.Price, menuItem.Category },
+                    "sp_CreateMenuItem",
+                    new { menuItem.Name, menuItem.Price, menuItem.Category,menuItem.ImageUrl },
                     commandType: CommandType.StoredProcedure
                 );
             }

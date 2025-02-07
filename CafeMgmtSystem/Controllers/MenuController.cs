@@ -37,8 +37,6 @@ namespace CafeMgmtSystem.Controllers
         }
 
         [HttpPost]
-        [Route("create-menu-item")]
-        [Consumes("multipart/form-data")]
         public async Task<IActionResult> CreateMenuItem([FromForm] MenuItem menuItem, [FromForm] IFormFile imageFile)
         {
             if (imageFile == null || imageFile.Length == 0)
