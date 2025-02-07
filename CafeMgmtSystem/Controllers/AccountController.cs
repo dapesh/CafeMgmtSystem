@@ -58,7 +58,7 @@ namespace CafeMgmtSystem.Controllers
             }
 
             var token = GenerateJwtToken(user);
-            return Ok(new TokenModel { Token = token, Code="200" });
+            return Ok(new TokenModel { Code="200", Message="Success", Token = token });
         }
         [HttpGet]
         [Authorize]

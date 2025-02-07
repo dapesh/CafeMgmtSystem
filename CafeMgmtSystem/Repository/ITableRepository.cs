@@ -9,7 +9,7 @@ namespace CafeMgmtSystem.Repository
         int CreateTable(Table table);
         int UpdateTable(Table table);
         int DeleteTable(int id);
-        bool BookTable(int id, DateTime reservedUntil);
+        bool BookTable(int id, string reservedUntil);
         bool ReleaseTable(int id);
     }
 }
