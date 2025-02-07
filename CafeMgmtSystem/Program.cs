@@ -1,7 +1,9 @@
 using CafeManagementSystem.Data;
 using CafeManagementSystem.Models;
+using CafeMgmtSystem.Models;
 using CafeMgmtSystem.Repository;
 using CafeMgmtSystem.Services;
+using CloudinaryDotNet;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -36,8 +38,14 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddSingleton<IDbConnectionFactory>(provider =>
     new DbConnectionFactory(builder.Configuration.GetConnectionString("DefaultConnection")));
+var cloudinarySettings = builder.Configuration.GetSection("CloudinarySettings").Get<CloudinarySettings>();
+if (cloudinarySettings != null)
+{
+    var account = new Account(cloudinarySettings.CloudName, cloudinarySettings.ApiKey, cloudinarySettings.ApiSecret);
+    Cloudinary cloudinary = new Cloudinary(account);
+    builder.Services.AddSingleton(cloudinary);
+}
 builder.Services.AddSingleton<CloudinaryService>();
-
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();

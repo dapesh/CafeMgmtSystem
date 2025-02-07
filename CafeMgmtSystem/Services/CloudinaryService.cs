@@ -6,14 +6,9 @@ namespace CafeMgmtSystem.Services
     public class CloudinaryService
     {
         private readonly Cloudinary _cloudinary;
-        public CloudinaryService(IConfiguration configuration)
+        public CloudinaryService(Cloudinary cloudinary)
         {
-            var account = new Account(
-               configuration["Cloudinary:CloudName"],
-               configuration["Cloudinary:ApiKey"],
-               configuration["Cloudinary:ApiSecret"]
-           );
-            _cloudinary = new Cloudinary(account);
+            _cloudinary = cloudinary;
         }
         public async Task<string> UploadImageAsync(IFormFile file)
         {
