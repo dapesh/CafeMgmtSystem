@@ -1,6 +1,7 @@
 ﻿using CafeMgmtSystem.Models;
 using CafeMgmtSystem.Repository;
 using CafeMgmtSystem.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,6 +20,7 @@ namespace CafeMgmtSystem.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public IActionResult GetAllMenuItems()
         {
             var menuItems = _menuItemRepository.GetAllMenuItems();
@@ -36,26 +38,26 @@ namespace CafeMgmtSystem.Controllers
             return Ok(menuItem);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateMenuItem([FromForm] MenuItem menuItem, [FromForm] IFormFile imageFile)
-        {
-            if (imageFile == null || imageFile.Length == 0)
-            {
-                return BadRequest("Image file is required.");
-            }
-            var imageUrl = await _cloudinaryService.UploadImageAsync(imageFile);
-            if (string.IsNullOrEmpty(imageUrl))
-            {
-                return BadRequest("Image upload failed.");
-            }
-            menuItem.ImageUrl = imageUrl;
-            var result = _menuItemRepository.CreateMenuItems(menuItem);
-            if (result == 0)
-            {
-                return BadRequest("Failed to create menu item.");
-            }
-            return CreatedAtAction(nameof(GetMenuItemById), new { id = menuItem.Id }, menuItem);
-        }
+        //[HttpPost]
+        //public async Task<IActionResult> CreateMenuItem([FromForm] MenuItem menuItem, [FromForm] IFormFile imageFile)
+        //{
+        //    if (imageFile == null || imageFile.Length == 0)
+        //    {
+        //        return BadRequest("Image file is required.");
+        //    }
+        //    var imageUrl = await _cloudinaryService.UploadImageAsync(imageFile);
+        //    if (string.IsNullOrEmpty(imageUrl))
+        //    {
+        //        return BadRequest("Image upload failed.");
+        //    }
+        //    menuItem.ImageUrl = imageUrl;
+        //    var result = _menuItemRepository.CreateMenuItems(menuItem);
+        //    if (result == 0)
+        //    {
+        //        return BadRequest("Failed to create menu item.");
+        //    }
+        //    return CreatedAtAction(nameof(GetMenuItemById), new { id = menuItem.Id }, menuItem);
+        //}
 
         [HttpPut("{id}")]
         public IActionResult UpdateMenuItem(int id, [FromBody] MenuItem menuItem)
