@@ -20,21 +20,18 @@ namespace CafeMgmtSystem.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly SmsService _smsService;
         private readonly MailService _mailService;
         private readonly IConfiguration _configuration;
         private readonly ITokenService _tokenService;
         public AccountController(UserManager<ApplicationUser> userManager,
                                   SignInManager<ApplicationUser> signInManager,
                                   IConfiguration configuration,
-                                  SmsService smsService,
                                   MailService mailService,
                                   ITokenService tokenService)
                                     {
                                         _userManager = userManager;
                                         _signInManager = signInManager;
                                         _configuration = configuration;
-                                        _smsService = smsService;
                                         _mailService = mailService;
                                         _tokenService = tokenService;
                                     }

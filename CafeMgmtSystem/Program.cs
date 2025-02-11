@@ -29,7 +29,6 @@ builder.Services.AddCors(options =>
     });
 });
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
-builder.Services.AddScoped<SmsService>();
 builder.Services.AddScoped<ITableRepository, TableRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IMenuRepository, MenuRepository>();

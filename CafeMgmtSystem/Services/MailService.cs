@@ -9,7 +9,6 @@ using MailKit.Search;
 using Org.BouncyCastle.Crypto;
 using static System.Net.WebRequestMethods;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-using Twilio.Types;
 
 namespace CafeMgmtSystem.Services
 {
