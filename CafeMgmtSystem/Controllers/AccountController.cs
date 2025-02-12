@@ -204,7 +204,7 @@ namespace CafeMgmtSystem.Controllers
             {
                 return BadRequest(new { Message = "Invalid OTP."});
             }
-            if(otpResults.isVerified =="y" && request.ProcessId == otpResults.Id)
+            if(otpResults.isVerified == "y" && request.ProcessId == otpResults.Id)
             {
                 return Ok(new { Message = "OTP already verified" });
             }
