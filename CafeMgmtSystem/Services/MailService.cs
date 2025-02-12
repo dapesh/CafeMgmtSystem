@@ -30,7 +30,7 @@ namespace CafeMgmtSystem.Services
             {
                 connection.Open();
                 string query = @"Select * from OtpHandlers  
-                                WHERE PhoneNumber = @PhoneNumber AND ISVERIFIED='p'";
+                                WHERE PhoneNumber = @PhoneNumber";
                 var result =  connection.Query<OtpHandler>(query, new { PhoneNumber = phoneNumber });
                 return result.FirstOrDefault();
             }
@@ -50,29 +50,9 @@ namespace CafeMgmtSystem.Services
         {
             using (var connection = Connection)
             {
-                // Retrieve phone number and email from token
                 var userPhone = _tokenService.GetUserDetailsFromToken("PhoneNumber");
                 var userEmail = _tokenService.GetUserDetailsFromToken("Email");
-                connection.Open();  // Open connection asynchronously
-
-                // Ensure proper parameterized query to prevent SQL injection
-                var query = @"
-                    SELECT Email,otp 
-                    FROM OtpHandlers 
-                    WHERE PhoneNumber = @PhoneNumber
-                    AND (isVerified IS NULL OR isVerified <> 'y')";
-
-                var optDetails = await connection.QueryAsync<OtpHandler>(query, new { PhoneNumber = userPhone });
-                if (!optDetails.Any())
-                {
-                    return new Common
-                    {
-                        Message = "Invalid OTP",
-                        Type = "error",
-                        StatusCode = StatusCodes.Status404NotFound
-                    };
-                }
-
+                connection.Open(); 
                 // Begin transaction
                 using var transaction = connection.BeginTransaction();
                 try
@@ -135,10 +115,8 @@ namespace CafeMgmtSystem.Services
                 }
                 catch (Exception ex)
                 {
-                    // Log the exception if needed (e.g., using a logging framework)
                     Console.WriteLine($"Error sending OTP: {ex.Message}");
 
-                    // Rollback the transaction if something goes wrong
                      transaction.Rollback();
 
                     return new Common
