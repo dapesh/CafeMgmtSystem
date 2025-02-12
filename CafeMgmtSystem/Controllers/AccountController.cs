@@ -59,6 +59,10 @@ namespace CafeMgmtSystem.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
