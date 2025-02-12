@@ -154,20 +154,29 @@ namespace CafeMgmtSystem.Controllers
         [HttpPost("request-otp")]
         public async Task<IActionResult> RequestOtp()
         {
-            var phoneNumber = _tokenService.GetUserDetailsFromToken("PhoneNumber");
-            var email = _tokenService.GetUserDetailsFromToken("Email");
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-            var emailResult = _mailService.SendEmailAsync(new MailRequest { ToEmail = email });
-            var otpResults = _mailService.GetOTPDetails(phoneNumber);
-
-            return Ok(new Common
+            try
             {
-                Message = "OTP sent successfully.",
-                Type = "success",
-                StatusCode = StatusCodes.Status200OK,
-                ProcessId = otpResults.Id,
-            });
+                var phoneNumber = _tokenService.GetUserDetailsFromToken("PhoneNumber");
+                _mailService.LogTable(phoneNumber);
+                var email = _tokenService.GetUserDetailsFromToken("Email");
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+                var emailResult = _mailService.SendEmailAsync(new MailRequest { ToEmail = email });
+                var otpResults = _mailService.GetOTPDetails(phoneNumber);
+
+                return Ok(new Common
+                {
+                    Message = "OTP sent successfully.",
+                    Type = "success",
+                    StatusCode = StatusCodes.Status200OK,
+                    ProcessId = otpResults.Id,
+                });
+            }
+            catch (Exception ex) 
+            {
+                _mailService.LogTable(ex.Message);
+                return Unauthorized(ex.Message);
+            }
         }
         [HttpPost("verify-otp")]
         public IActionResult VerifyOtp([FromBody] VerifyOtpRequest request)

@@ -9,5 +9,6 @@ namespace CafeMgmtSystem.Services
         //OtpHandler GetOTPDetails(string Email);
         OtpHandler GetOTPDetails(string Email);
         void UpdateOtpVerificationStatus(OtpHandler otpResults);
+        void LogTable(string Message);
     }
 }
