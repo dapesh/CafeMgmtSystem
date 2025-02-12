@@ -1,5 +1,6 @@
 using CafeManagementSystem.Data;
 using CafeManagementSystem.Models;
+using CafeMgmtSystem;
 using CafeMgmtSystem.Models;
 using CafeMgmtSystem.Repository;
 using CafeMgmtSystem.Services;
@@ -83,6 +84,7 @@ builder.Services.AddSwaggerGen(c =>
     }
 });
 var app = builder.Build();
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors("AllowAllOrigins");
     app.UseSwagger();
     app.UseSwaggerUI();
