@@ -35,6 +35,17 @@ namespace CafeMgmtSystem.Services
                 return result.FirstOrDefault();
             }
         }
+
+        public void LogTable(string Message)
+        {
+            using (var connection = Connection)
+            {
+                connection.Open();
+                string query = @"INSERT INTO LogTable (LogMessage) VALUES (@Message)";
+                connection.Execute(query, new { Message = Message });
+            }
+        }
+
         public async Task<Common> SendEmailAsync(MailRequest mailRequest)
         {
             using (var connection = Connection)

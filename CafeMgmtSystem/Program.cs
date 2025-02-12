@@ -82,28 +82,10 @@ builder.Services.AddSwaggerGen(c =>
         throw;
     }
 });
-
-
 var app = builder.Build();
-
-//if (app.Environment.IsDevelopment())
-//{
-    app.UseDeveloperExceptionPage();
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "CafeMgmtSystem API V1");
-        c.RoutePrefix = string.Empty; // Makes Swagger available at the root (localhost:5000/)
-    });
-//}
 app.UseCors("AllowAllOrigins");
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
     app.UseSwagger();
     app.UseSwaggerUI();
-}
-
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
