@@ -4,6 +4,7 @@ namespace CafeMgmtSystem.Models
 {
     public class VerifyOtpRequest
     {
+        [Required]
         public Guid ? ProcessId { get; set; }
 
         [Required]

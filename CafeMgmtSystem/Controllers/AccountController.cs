@@ -161,7 +161,7 @@ namespace CafeMgmtSystem.Controllers
                 var email = _tokenService.GetUserDetailsFromToken("Email");
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
-                var emailResult = _mailService.SendEmailAsync(new MailRequest { ToEmail = email });
+                var emailResult = await _mailService.SendEmailAsync(new MailRequest { ToEmail = email });
                 var otpResults = _mailService.GetOTPDetails(phoneNumber);
 
                 return Ok(new Common
@@ -194,15 +194,27 @@ namespace CafeMgmtSystem.Controllers
             }
             else
             {
-                return NotFound("User not found");
+                return NotFound(new { Message = "User not found" });
+            }
+            if(otpResults == null)
+            {
+                return BadRequest(new { Message = "Invalid OTP."});
+            }
+            if(otpResults.isVerified =="y" && request.ProcessId == otpResults.Id)
+            {
+                return Ok(new { Message = "OTP already verified" });
             }
             if (request.Otp != otpResults.Otp && request.ProcessId != otpResults.Id)
             {
-                return BadRequest("Invalid OTP.");
+                return BadRequest(new {Message = "Invalid OTP." });
+            }
+            if(request.ProcessId != otpResults.Id)
+            {
+                return BadRequest(new { Message = "Invalid Process ID" });
             }
             if (otpResults.CreateDate > otpResults.OtpExpiryTime)
             {
-                return Ok("Otp Has Expired");
+                return Ok(new { Message = "Otp Has Expired" });
             }
             otpResults.isVerified = "y";
             _mailService.UpdateOtpVerificationStatus(otpResults);
