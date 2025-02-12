@@ -29,7 +29,7 @@ namespace CafeMgmtSystem
 
             var errorResponse = new
             {
-                StatusCode = context.Response.StatusCode,
+                Code = context.Response.StatusCode,
                 Message = "An unexpected error occurred. Please try again later.",
                 Detailed = exception.Message // You can remove this in production for security reasons
             };
