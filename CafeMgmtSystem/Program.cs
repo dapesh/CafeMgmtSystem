@@ -84,6 +84,11 @@ builder.Services.AddSwaggerGen(c =>
     }
 });
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await RoleSeeder.SeedRoles(services);
+}
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors("AllowAllOrigins");
     app.UseSwagger();

@@ -38,62 +38,99 @@ namespace CafeMgmtSystem.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
-            if (!model.PhoneNumber.StartsWith("+977"))
-            {
-                return BadRequest("Phone number must start with +977.");
-            }
-            var user = new ApplicationUser { UserName = model.FirstName, Email = model.Email, FirstName = model.FirstName, LastName = model.LastName,PhoneNumber = model.PhoneNumber };
-            var result = await _userManager.CreateAsync(user, model.Password);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                if (!model.PhoneNumber.StartsWith("+977"))
+                {
+                    return BadRequest("Phone number must start with +977.");
+                }
+                var existingUser = await _userManager.Users.FirstOrDefaultAsync(u => u.PhoneNumber == model.PhoneNumber);
+                if (existingUser != null)
+                {
+                    return BadRequest(new { Code = "400", Message = "User with this Phone Number is already Registered " });
+                }
+                var user = new ApplicationUser { UserName = model.FullName.Replace(" ", ""), Email = model.Email, PhoneNumber = model.PhoneNumber };
 
-            if (!result.Succeeded)
-            {
-                return BadRequest(result.Errors.Select(e => e.Description));
-            }
+                var result = await _userManager.CreateAsync(user, model.Password);
 
-            return Ok(new { Message = "User registered successfully" , Code = "200"});
+                if (!result.Succeeded)
+                {
+                    return BadRequest(new { Code = "400", Message = result.Errors.Select(e => e.Description) });
+                }
+                await _userManager.AddToRoleAsync(user, "User");
+                return Ok(new { Message = "User registered successfully", Code = "200" });
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Code = 500,
+                    Message = "An unexpected error occurred. Please try again later.",
+                    Detailed = ex.InnerException?.Message ?? ex.Message
+                });
+            }
+            
         }
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
-            var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user == null)
-            {
-                return Unauthorized(new { Message = "Invalid login attempt" });
-            }
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var user = await _userManager.Users
+                                     .FirstOrDefaultAsync(u => u.PhoneNumber == model.PhoneNumber);
+                //var user = await _userManager.FindByEmailAsync(model.PhoneNumber);
+                if (user == null)
+                {
+                    return Unauthorized(new { Code = "400", Message = "Invalid login attempt" });
+                }
 
-            var result = await _signInManager.PasswordSignInAsync(user, model.Password, false, false);
-            if (!result.Succeeded)
-            {
-                return Unauthorized(new { Message = "Invalid login attempt" });
-            }
+                var result = await _signInManager.PasswordSignInAsync(user, model.Password, false, false);
+                if (!result.Succeeded)
+                {
+                    return Unauthorized(new { Code = "400", Message = "Invalid login attempt" });
+                }
 
-            var accessToken = GenerateJwtToken(user);
-            var refreshToken = GenerateRefreshToken();
-            //user.RefreshToken = refreshToken;
-            var RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7); 
-            //await _userManager.UpdateAsync(user);
-            return Ok(new TokenModel { Code="200", Message="Success", Token = accessToken, RefreshToken = refreshToken });
+                var accessToken = await GenerateJwtToken(user);
+                var refreshToken = GenerateRefreshToken();
+                //user.RefreshToken = refreshToken;
+                var RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+                //await _userManager.UpdateAsync(user);
+                return Ok(new TokenModel { Code = "200", Message = "Success", Token = accessToken, RefreshToken = refreshToken });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Code = 500,
+                    Message = "An unexpected error occurred. Please try again later.",
+                    Detailed = ex.InnerException?.Message ?? ex.Message
+                });
+            }
         }
-        private string GenerateJwtToken(ApplicationUser user)
+        private async Task<string> GenerateJwtToken(ApplicationUser user)
         {
-            var claims = new[]
+            var userRoles = await _userManager.GetRolesAsync(user);
+            var claims = new List<System.Security.Claims.Claim>
             {
             new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.NameIdentifier, user.Id),
             new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, user.UserName),
-            new System.Security.Claims.Claim("FirstName", user.FirstName),
-            new System.Security.Claims.Claim("LastName", user.LastName),
+            new System.Security.Claims.Claim("FirstName", user.UserName),
+            //new System.Security.Claims.Claim("LastName", user.LastName),
             new System.Security.Claims.Claim("PhoneNumber", user.PhoneNumber),
             new System.Security.Claims.Claim("Email", user.Email)
             };
-
+            foreach (var role in userRoles)
+            {
+                claims.Add(new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Role, role));
+            }
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
@@ -115,7 +152,7 @@ namespace CafeMgmtSystem.Controllers
             {
                 return NotFound();  
             }
-            var username = user.FirstName + " " + user.LastName;
+            var username = user.UserName;
             return Ok(username);
         }
         private string GenerateRefreshToken()
