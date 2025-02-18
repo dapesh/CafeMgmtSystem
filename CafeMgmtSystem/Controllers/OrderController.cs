@@ -35,7 +35,7 @@ namespace CafeMgmtSystem.Controllers
             {
                 return NotFound();
             }
-            var userFullName = userDetails.FirstName + " " + userDetails.LastName;
+            var userFullName = userDetails.UserName;
             if (request.Items == null || !request.Items.Any())
             {
                 return BadRequest("Order items are required.");

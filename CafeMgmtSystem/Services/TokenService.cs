@@ -19,8 +19,8 @@ namespace CafeMgmtSystem.Services
         {
             var claims = new List<Claim>
             {
-                new Claim("FirstName", user.FirstName),
-                new Claim("LastName", user.LastName),
+                new Claim("FirstName", user.UserName),
+                //new Claim("LastName", user.LastName),
                 new Claim("PhoneNumber", user.PhoneNumber),
                 new Claim("Email", user.Email),
                 new Claim("userid", user.Id.ToString())
