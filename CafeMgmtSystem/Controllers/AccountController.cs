@@ -138,7 +138,7 @@ namespace CafeMgmtSystem.Controllers
                 _configuration["Jwt:Issuer"],
                 _configuration["Jwt:Audience"],
                 claims,
-                expires: DateTime.Now.AddDays(1),
+                expires: DateTime.Now.AddMinutes(5),
                 signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
@@ -183,7 +183,7 @@ namespace CafeMgmtSystem.Controllers
             
             var newAccessToken = GenerateJwtToken(user);
             var newRefreshToken = GenerateRefreshToken();
-            var RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+            var RefreshTokenExpiryTime = DateTime.UtcNow.AddMinutes(30);
             return Ok(new
             {
                 Code = "200",
@@ -266,6 +266,12 @@ namespace CafeMgmtSystem.Controllers
                 StatusCode = StatusCodes.Status200OK,
                 ProcessId = otpResults.Id
             });
+        }
+        [Authorize]
+        [HttpGet("authorize")]
+        public IActionResult Auth()
+        {
+            return Ok(true);
         }
     }
 }
