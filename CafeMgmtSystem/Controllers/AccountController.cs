@@ -35,6 +35,12 @@ namespace CafeMgmtSystem.Controllers
                                         _mailService = mailService;
                                         _tokenService = tokenService;
                                     }
+        [Authorize]
+        [HttpGet("auth")]
+        public IActionResult Auth()
+        {
+            return Ok(true);
+        }
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
@@ -266,12 +272,6 @@ namespace CafeMgmtSystem.Controllers
                 StatusCode = StatusCodes.Status200OK,
                 ProcessId = otpResults.Id
             });
-        }
-        [Authorize]
-        [HttpGet("authorize")]
-        public IActionResult Auth()
-        {
-            return Ok(true);
         }
     }
 }
