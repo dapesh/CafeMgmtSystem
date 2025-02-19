@@ -10,19 +10,16 @@ namespace CafeMgmtSystem.Controllers
     public class TableController : ControllerBase
     {
         private readonly ITableRepository _tableRepository;
-
         public TableController(ITableRepository tableRepository)
         {
             _tableRepository = tableRepository;
         }
-
         [HttpGet]
         public IActionResult GetAllTables()
         {
             var tables =  _tableRepository.GetAllTables();
             return Ok(tables);
         }
-
         [HttpGet("{id}")]
         public  IActionResult GetTableById(int id)
         {
@@ -33,7 +30,6 @@ namespace CafeMgmtSystem.Controllers
             }
             return Ok(table);
         }
-
         [HttpPost]
         public  IActionResult CreateTable([FromBody] Table table)
         {
@@ -44,7 +40,6 @@ namespace CafeMgmtSystem.Controllers
             }
             return CreatedAtAction(nameof(GetTableById), new { id = table.Id }, table);
         }
-
         [HttpPut("{id}")]
         public IActionResult UpdateTable(int id, [FromBody] Table table)
         {
@@ -56,7 +51,6 @@ namespace CafeMgmtSystem.Controllers
             }
             return NoContent();
         }
-
         [HttpDelete("{id}")]
         public  IActionResult DeleteTable(int id)
         {

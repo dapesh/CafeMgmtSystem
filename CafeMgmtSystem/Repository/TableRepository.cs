@@ -8,14 +8,11 @@ namespace CafeMgmtSystem.Repository
     public class TableRepository : ITableRepository
     {
         private readonly IDbConnectionFactory _dbConnectionFactory;
-
         public TableRepository(IDbConnectionFactory dbConnectionFactory)
         {
             _dbConnectionFactory = dbConnectionFactory;
         }
-
         private IDbConnection Connection => _dbConnectionFactory.CreateConnection();
-
         public IEnumerable<Table> GetAllTables()
         {
             using (var connection = Connection)
@@ -33,7 +30,6 @@ namespace CafeMgmtSystem.Repository
                 return tables;
             }
         }
-
         public Table GetTableById(int id)
         {
             using (var connection = Connection)
@@ -51,7 +47,6 @@ namespace CafeMgmtSystem.Repository
                 return tables;
             }
         }
-
         public int CreateTable(Table table)
         {
             using (var connection = Connection)
@@ -92,7 +87,6 @@ namespace CafeMgmtSystem.Repository
                 return result;
             }
         }
-
         public int DeleteTable(int id)
         {
             using (var connection = Connection)
@@ -110,7 +104,6 @@ namespace CafeMgmtSystem.Repository
                 return result;
             }
         }
-
         public bool BookTable(int id, string reservedUntil)
         {
             using (var connection = Connection)
@@ -129,7 +122,6 @@ namespace CafeMgmtSystem.Repository
                 return affectedRows > 0;
             }
         }
-
         public bool ReleaseTable(int id)
         {
             using (var connection = Connection)

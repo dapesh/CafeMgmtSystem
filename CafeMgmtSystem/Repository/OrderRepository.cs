@@ -18,14 +18,12 @@ namespace CafeMgmtSystem.Repository
             using (var connection = Connection)
             {
                 connection.Open();
-
-                // Insert item into order
                 var result = connection.Execute(
-                    "AddItemToOrder", // Ensure the stored procedure name
+                    "AddItemToOrder",
                     new
                     {
                         orderItem.OrderId,
-                        orderItem.MenuItemId, // Ensure MenuItemId is valid
+                        orderItem.MenuItemId,
                         orderItem.ProductName,
                         orderItem.Quantity,
                         orderItem.Price
@@ -33,7 +31,7 @@ namespace CafeMgmtSystem.Repository
                     commandType: CommandType.StoredProcedure
                 );
 
-                return result; // Number of rows affected
+                return result; 
             }
         }
         public int CreateOrder(Order order)
@@ -41,25 +39,12 @@ namespace CafeMgmtSystem.Repository
             using (var connection = Connection)
             {
                 connection.Open();
-
-                // Declare the output parameter for the OrderId
                 var parameters = new DynamicParameters();
                 parameters.Add("TotalAmount", order.TotalAmount);
                 parameters.Add("Status", order.OrderStatus.Status);
                 parameters.Add("TableId", order.ReservationId);
                 parameters.Add("CustomerId", order.CustomerId);
                 parameters.Add("CustomerName", order.CustomerName);
-
-                // Add TableId here
-                // Assuming OrderStatus is passed with ID
-                //parameters.Add("OrderId", dbType: DbType.Int32, direction: ParameterDirection.Output); // Output parameter
-
-                // Execute the stored procedure
-                //connection.Execute(
-                //    "CreateOrder",
-                //    parameters,
-                //    commandType: CommandType.StoredProcedure
-                //);
                 int orderId = connection.QuerySingle<int>(
                 "CreateOrder",
                 parameters,
@@ -68,14 +53,11 @@ namespace CafeMgmtSystem.Repository
                 return orderId;
             }
         }
-
         public Order GetOrderById(int id)
         {
             using (var connection = Connection)
             {
                 connection.Open();
-
-                // Fetch the order with its related items and status
                 var query = @"SELECT o.*, os.Status AS OrderStatus 
                               FROM Orders o
                               LEFT JOIN OrderStatuses os ON o.OrderStatusId = os.Id
@@ -86,7 +68,7 @@ namespace CafeMgmtSystem.Repository
                     new { Id = id }
                 );
 
-                return order; // Return the order with its items and status
+                return order;
             }
         }
         public int UpdateOrderStatus(int orderId, int statusId)
@@ -94,15 +76,12 @@ namespace CafeMgmtSystem.Repository
             using (var connection = Connection)
             {
                 connection.Open();
-
-                // Update order status in the database
                 var result = connection.Execute(
-                    "UpdateOrderStatus", // Ensure the stored procedure name
+                    "UpdateOrderStatus",
                     new { OrderId = orderId, StatusId = statusId },
                     commandType: CommandType.StoredProcedure
                 );
-
-                return result; // Should return the number of rows affected (should be 1 if successful)
+                return result; 
             }
         }
         public int AddPayment(Payment payment)
@@ -112,7 +91,7 @@ namespace CafeMgmtSystem.Repository
                 connection.Open();
 
                 var result = connection.Execute(
-                    "AddPayment", // Ensure the stored procedure name
+                    "AddPayment", 
                     new
                     {
                         payment.OrderId,
@@ -123,7 +102,7 @@ namespace CafeMgmtSystem.Repository
                     commandType: CommandType.StoredProcedure
                 );
 
-                return result; // Returns the number of rows affected
+                return result; 
             }
         }
         public int CreateReservation(Reservation reservation)
@@ -131,9 +110,8 @@ namespace CafeMgmtSystem.Repository
             using (var connection = Connection)
             {
                 connection.Open();
-
                 var result = connection.Execute(
-                    "CreateReservation", // Ensure the stored procedure name
+                    "CreateReservation", 
                     new
                     {
                         reservation.UserId,
@@ -143,8 +121,7 @@ namespace CafeMgmtSystem.Repository
                     },
                     commandType: CommandType.StoredProcedure
                 );
-
-                return result; // Returns the number of rows affected
+                return result;
             }
         }
     }

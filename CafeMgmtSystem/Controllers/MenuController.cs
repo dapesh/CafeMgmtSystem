@@ -18,7 +18,6 @@ namespace CafeMgmtSystem.Controllers
             _menuItemRepository = menuItemRepository;
             _cloudinaryService = cloudinaryService;
         }
-
         [HttpGet]
         [Authorize]
         public IActionResult GetAllMenuItems()
@@ -26,7 +25,6 @@ namespace CafeMgmtSystem.Controllers
             var menuItems = _menuItemRepository.GetAllMenuItems();
             return Ok(menuItems);
         }
-
         [HttpGet("{id}")]
         public IActionResult GetMenuItemById(int id)
         {
@@ -37,28 +35,6 @@ namespace CafeMgmtSystem.Controllers
             }
             return Ok(menuItem);
         }
-
-        //[HttpPost]
-        //public async Task<IActionResult> CreateMenuItem([FromForm] MenuItem menuItem, [FromForm] IFormFile imageFile)
-        //{
-        //    if (imageFile == null || imageFile.Length == 0)
-        //    {
-        //        return BadRequest("Image file is required.");
-        //    }
-        //    var imageUrl = await _cloudinaryService.UploadImageAsync(imageFile);
-        //    if (string.IsNullOrEmpty(imageUrl))
-        //    {
-        //        return BadRequest("Image upload failed.");
-        //    }
-        //    menuItem.ImageUrl = imageUrl;
-        //    var result = _menuItemRepository.CreateMenuItems(menuItem);
-        //    if (result == 0)
-        //    {
-        //        return BadRequest("Failed to create menu item.");
-        //    }
-        //    return CreatedAtAction(nameof(GetMenuItemById), new { id = menuItem.Id }, menuItem);
-        //}
-
         [HttpPut("{id}")]
         public IActionResult UpdateMenuItem(int id, [FromBody] MenuItem menuItem)
         {
@@ -70,7 +46,6 @@ namespace CafeMgmtSystem.Controllers
             }
             return NoContent();
         }
-
         [HttpDelete("{id}")]
         public IActionResult DeleteMenuItem(int id)
         {

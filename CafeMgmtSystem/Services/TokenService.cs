@@ -20,11 +20,9 @@ namespace CafeMgmtSystem.Services
             var claims = new List<Claim>
             {
                 new Claim("FirstName", user.UserName),
-                //new Claim("LastName", user.LastName),
                 new Claim("PhoneNumber", user.PhoneNumber),
                 new Claim("Email", user.Email),
                 new Claim("userid", user.Id.ToString())
-                //new Claim(ClaimTypes.NameIdentifier, user.Username)
             };
             var creds = new SigningCredentials(_Key, SecurityAlgorithms.HmacSha256Signature);
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -40,13 +38,12 @@ namespace CafeMgmtSystem.Services
             CookieOptions options = new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true, // Make sure to use HTTPS
-                Expires = DateTime.UtcNow.AddHours(1) // Set cookie expiration
+                Secure = true, 
+                Expires = DateTime.UtcNow.AddHours(1) 
             };
             _httpContextAccessor.HttpContext.Response.Cookies.Append("token", encodedToken, options);
             return encodedToken.ToString();
         }
-
         public string GetUserDetailsFromToken(string key)
         {
             var httpContext = _httpContextAccessor.HttpContext;
