@@ -20,12 +20,10 @@ namespace CafeMgmtSystem.Controllers
             {
                 return BadRequest(new { message = "Invalid request. Order ID is required." });
             }
-            // Simulate payment success
             bool paymentSuccess = true;
 
             if (paymentSuccess)
             {
-                // Update order status to 'Paid' (Assume 2 is the status for 'Paid')
                 bool updated = await _orderService.UpdateOrderStatusAsync(request.OrderId, LatestOrderStatus.Paid);
 
                 if (updated)
@@ -105,7 +103,6 @@ namespace CafeMgmtSystem.Controllers
                     status = LatestOrderStatus.Cancelled.ToString()
                 });
             }
-
             return StatusCode(500, new { message = "Failed to cancel the order." });
         }
     }

@@ -92,7 +92,6 @@ namespace CafeMgmtSystem.Controllers
                 }
                 var user = await _userManager.Users
                                      .FirstOrDefaultAsync(u => u.PhoneNumber == model.PhoneNumber);
-                //var user = await _userManager.FindByEmailAsync(model.PhoneNumber);
                 if (user == null)
                 {
                     return Unauthorized(new { Code = "400", Message = "Invalid login attempt" });
@@ -106,9 +105,7 @@ namespace CafeMgmtSystem.Controllers
 
                 var accessToken = await GenerateJwtToken(user);
                 var refreshToken = GenerateRefreshToken();
-                //user.RefreshToken = refreshToken;
                 var RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
-                //await _userManager.UpdateAsync(user);
                 return Ok(new TokenModel { Code = "200", Message = "Success", Token = accessToken, RefreshToken = refreshToken });
             }
             catch (Exception ex)
@@ -129,7 +126,6 @@ namespace CafeMgmtSystem.Controllers
             new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.NameIdentifier, user.Id),
             new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, user.UserName),
             new System.Security.Claims.Claim("FirstName", user.UserName),
-            //new System.Security.Claims.Claim("LastName", user.LastName),
             new System.Security.Claims.Claim("PhoneNumber", user.PhoneNumber),
             new System.Security.Claims.Claim("Email", user.Email)
             };
@@ -215,7 +211,7 @@ namespace CafeMgmtSystem.Controllers
                 {
                     Message = "OTP sent successfully.",
                     Type = "success",
-                    StatusCode = StatusCodes.Status200OK,
+                    Code = StatusCodes.Status200OK,
                     ProcessId = otpResults.Id,
                 });
             }
@@ -241,27 +237,27 @@ namespace CafeMgmtSystem.Controllers
             }
             else
             {
-                return NotFound(new { Message = "User not found" });
+                return NotFound(new { Code="400", Message = "User not found" });
             }
             if(otpResults == null)
             {
-                return BadRequest(new { Message = "Invalid OTP."});
+                return BadRequest(new { Code = "400", Message = "Invalid OTP."});
             }
             if(otpResults.isVerified == "y" && request.ProcessId == otpResults.Id)
             {
-                return Ok(new { Message = "OTP already verified" });
+                return BadRequest(new { Code = "400", Message = "OTP already verified" });
             }
             if (request.Otp != otpResults.Otp && request.ProcessId != otpResults.Id)
             {
-                return BadRequest(new {Message = "Invalid OTP." });
+                return BadRequest(new { Code = "400", Message = "Invalid OTP." });
             }
             if(request.ProcessId != otpResults.Id)
             {
-                return BadRequest(new { Message = "Invalid Process ID" });
+                return BadRequest(new { Code = "400", Message = "Invalid Process ID" });
             }
             if (otpResults.CreateDate > otpResults.OtpExpiryTime)
             {
-                return Ok(new { Message = "Otp Has Expired" });
+                return BadRequest(new { Code = "400", Message = "Otp Has Expired" });
             }
             otpResults.isVerified = "y";
             _mailService.UpdateOtpVerificationStatus(otpResults);
@@ -269,7 +265,7 @@ namespace CafeMgmtSystem.Controllers
             {
                 Message = "OTP verified successfully.",
                 Type = "success",
-                StatusCode = StatusCodes.Status200OK,
+                Code = StatusCodes.Status200OK,
                 ProcessId = otpResults.Id
             });
         }

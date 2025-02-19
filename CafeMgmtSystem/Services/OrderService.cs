@@ -15,7 +15,6 @@ namespace CafeMgmtSystem.Services
         private readonly IPaymentRepository _paymentRepository;
         private readonly IMenuRepository _menuRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
-
         public OrderService(IOrderRepository orderRepository, IMenuRepository menuRepository, IHttpContextAccessor httpContextAccessor, IPaymentRepository paymentRepository)
         {
             _orderRepository = orderRepository;
@@ -23,7 +22,6 @@ namespace CafeMgmtSystem.Services
             _httpContextAccessor = httpContextAccessor;
             _paymentRepository = paymentRepository;
         }
-
         public int CreateOrder(string customerId,int TableID, List<OrderItem> items, string userFullName)
         {
             decimal totalAmount = 0;
@@ -39,7 +37,6 @@ namespace CafeMgmtSystem.Services
                 item.Price = menuItem.Price;
                 totalAmount += item.Price * item.Quantity;
             }
-
             var order = new Order
             {
                 CustomerId = customerId,
@@ -49,18 +46,14 @@ namespace CafeMgmtSystem.Services
                 ReservationId= TableID,
                 CustomerName = userFullName
             };
-
             int orderId = _orderRepository.CreateOrder(order);
-
             foreach (var item in items)
             {
                 item.OrderId = orderId;
                 _orderRepository.AddItemToOrder(item);
             }
-
             return orderId;
         }
-
         public bool UpdateOrderStatus(int orderId, int status)
         {
             int affectedRows = _orderRepository.UpdateOrderStatus(orderId, status);

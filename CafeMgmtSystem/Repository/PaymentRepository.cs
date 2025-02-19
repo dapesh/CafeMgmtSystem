@@ -16,7 +16,6 @@ namespace CafeMgmtSystem.Repository
             _dbConnectionFactory = dbConnectionFactory;
         }
         private IDbConnection Connection => _dbConnectionFactory.CreateConnection();
-
         public async Task<bool> UpdateOrderStatusAsync(int orderId, LatestOrderStatus status)
         {
             using (var connection = Connection)
@@ -25,15 +24,12 @@ namespace CafeMgmtSystem.Repository
                 var parameters = new DynamicParameters();
                 parameters.Add("@OrderId", orderId, DbType.Int32);
                 parameters.Add("@Status", status.ToString(), DbType.String);
-                //var result = await connection.ExecuteAsync("sp_UpdateOrderStatus", parameters, commandType: CommandType.StoredProcedure);
-                //int rowsAffected = await connection.ExecuteAsync("sp_UpdateOrderStatus", parameters, commandType: CommandType.StoredProcedure);
                 var result = await connection.QuerySingleOrDefaultAsync<int>(
                     "sp_UpdateOrderStatus",
                     parameters,
                     commandType: CommandType.StoredProcedure
                 );
                 return result == 1;
-                //return rowsAffected > 0;
             }
         }
     }

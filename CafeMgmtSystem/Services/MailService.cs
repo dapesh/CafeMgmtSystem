@@ -35,7 +35,6 @@ namespace CafeMgmtSystem.Services
                 return result.FirstOrDefault();
             }
         }
-
         public void LogTable(string Message)
         {
             using (var connection = Connection)
@@ -45,7 +44,6 @@ namespace CafeMgmtSystem.Services
                 connection.Execute(query, new { Message = Message });
             }
         }
-
         public async Task<Common> SendEmailAsync(MailRequest mailRequest)
         {
             using (var connection = Connection)
@@ -53,18 +51,14 @@ namespace CafeMgmtSystem.Services
                 var userPhone = _tokenService.GetUserDetailsFromToken("PhoneNumber");
                 var userEmail = _tokenService.GetUserDetailsFromToken("Email");
                 connection.Open(); 
-                // Begin transaction
                 using var transaction = connection.BeginTransaction();
                 try
                 {
-                    // Invalidate previous OTPs
                     var updateRows = await connection.ExecuteAsync(
                         @"UPDATE OtpHandlers SET isVerified = 'n' WHERE PhoneNumber = @PhoneNumber",
                         new { PhoneNumber = userPhone },
                         transaction
                     );
-
-                    // Generate new OTP
                     var otpCode = new Random().Next(100000, 999999).ToString();
                     var OtpExpiryTime = DateTime.UtcNow.AddMinutes(5);
                     var newOtp = new OtpHandler
@@ -76,40 +70,28 @@ namespace CafeMgmtSystem.Services
                         Otp = otpCode,
                         OtpExpiryTime= OtpExpiryTime
                     };
-
-                    // Insert new OTP record
                     var insertRows = await connection.ExecuteAsync(
                         "INSERT INTO OtpHandlers (Email, PhoneNumber, IsVerified, CreateDate, Otp, OtpExpiryTime) VALUES (@Email, @PhoneNumber, @isVerified, @CreateDate, @Otp, @OtpExpiryTime)",
                         newOtp,
                         transaction
                     );
-
-                    // Commit the transaction
-                     transaction.Commit();
-
-                    // Send email asynchronously
+                    transaction.Commit();
                     mailRequest.Subject = "Forget Password";
                     mailRequest.Body = Function.Emailtemp(userEmail, otpCode);
-
                     var email = new MimeMessage();
                     email.Sender = MailboxAddress.Parse(_mailSettings.Mail);
                     email.To.Add(MailboxAddress.Parse(mailRequest.ToEmail));
                     email.Subject = mailRequest.Subject;
-
                     var builder = new BodyBuilder { HtmlBody = mailRequest.Body };
                     email.Body = builder.ToMessageBody();
-
                     using var smtp = new SmtpClient();
                     await smtp.ConnectAsync(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.StartTls);
-                    //await smtp.AuthenticateAsync(_mailSettings.Mail, _mailSettings.Password);
-                    //await smtp.SendAsync(email);
                     await smtp.DisconnectAsync(true);
-
                     return new Common
                     {
                         Message = "OTP Sent Successfully",
                         Type = "success",
-                        StatusCode = StatusCodes.Status200OK,
+                        Code = StatusCodes.Status200OK,
                         Email = userEmail
                     };
                 }
@@ -123,7 +105,7 @@ namespace CafeMgmtSystem.Services
                     {
                         Message = "Failed to send OTP",
                         Type = "error",
-                        StatusCode = StatusCodes.Status500InternalServerError
+                        Code = StatusCodes.Status500InternalServerError
                     };
                 }
             }
@@ -142,7 +124,6 @@ namespace CafeMgmtSystem.Services
                 return result;
             }
         }
-
         public void UpdateOtpVerificationStatus(OtpHandler otpResults)
         {
             using (var connection = Connection)

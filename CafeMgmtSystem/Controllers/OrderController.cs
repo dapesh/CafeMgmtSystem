@@ -44,7 +44,6 @@ namespace CafeMgmtSystem.Controllers
             int orderId = _orderService.CreateOrder(customerID, request.ReservationId, request.Items, userFullName);
             return Ok(new { orderId = orderId });
         }
-
         [HttpPost("UpdateOrderStatus")]
         public IActionResult UpdateOrderStatus([FromQuery] int orderId, [FromQuery] int status)
         {
