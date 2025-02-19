@@ -6,10 +6,11 @@ namespace CafeMgmtSystem
     public class ExceptionMiddleware
     {
         private readonly RequestDelegate _next;
-
-        public ExceptionMiddleware(RequestDelegate next)
+        private readonly ILogger<ExceptionMiddleware> _logger;
+        public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
         {
             _next = next;
+            _logger = logger;
         }
         public async Task InvokeAsync(HttpContext context)
         {
@@ -19,6 +20,7 @@ namespace CafeMgmtSystem
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred processing the request");
                 await HandleExceptionAsync(context, ex);
             }
         }
